@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link, NavLink } from 'react-router-dom';
+import { HashRouter, Routes, Route, Link, NavLink } from 'react-router-dom';
 import { GraduationCap } from 'lucide-react';
 
 export default function App() {
@@ -13,7 +13,7 @@ export default function App() {
     isActive ? { color: '#A855F7' } : {};
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       {/* Container in dark mode with full height */}
       <div className="full-page-container bg-dark text-white" style={{ minHeight: '100vh' }}>
         
@@ -57,6 +57,6 @@ export default function App() {
           </Routes>
         </main>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
