@@ -1,37 +1,30 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Search, 
-  BookOpen, 
-  Clock, 
-  Users, 
-  Star, 
-  ArrowRight, 
-  GraduationCap, 
-  TrendingUp, 
-  Award 
+  Search, BookOpen, Clock, Users, Star, ArrowRight, GraduationCap, TrendingUp, Award 
 } from 'lucide-react';
-import { COURSES_DATA } from '../data/coursesData';
+import { useData } from '../contexts/DataContext';
 
 export default function Home() {
   const navigate = useNavigate();
+  const { courses } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
   // Interactive metrics calculation
   const totalStudents = useMemo(() => {
-    return COURSES_DATA.reduce((acc, c) => acc + c.studentsCount, 0);
-  }, []);
+    return courses.reduce((acc, c) => acc + c.studentsCount, 0);
+  }, [courses]);
 
   const totalHours = useMemo(() => {
-    return COURSES_DATA.reduce((acc, c) => {
+    return courses.reduce((acc, c) => {
       const num = parseInt(c.duration.replace(/\D/g, ''));
       return acc + (isNaN(num) ? 0 : num);
     }, 0);
-  }, []);
+  }, [courses]);
 
   const filteredCourses = useMemo(() => {
-    return COURSES_DATA.filter(course => {
+    return courses.filter(course => {
       const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             course.instructorName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -40,7 +33,7 @@ export default function Home() {
 
       return matchesSearch && matchesCategory;
     });
-  }, [searchTerm, selectedCategory]);
+  }, [courses, searchTerm, selectedCategory]);
 
   return (
     <div className="container-fluid px-4 py-4">
@@ -97,7 +90,7 @@ export default function Home() {
           <div className="glass-panel p-4 rounded-4 text-center text-md-start d-flex align-items-center justify-content-between">
             <div>
               <p className="text-muted text-uppercase small mb-1 fw-bold tracking-wider">Cursos Disponíveis</p>
-              <h2 className="mb-0 display-font fw-extrabold">{COURSES_DATA.length}</h2>
+              <h2 className="mb-0 display-font fw-extrabold">{courses.length}</h2>
             </div>
             <div className="bg-primary bg-opacity-10 text-primary p-3 rounded-3">
               <BookOpen size={24} />
@@ -189,7 +182,6 @@ export default function Home() {
                     alt={course.title} 
                     className="premium-card-img"
                     onError={(e) => {
-                      // Fallback in case of network issue
                       (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop';
                     }}
                   />
@@ -244,7 +236,7 @@ export default function Home() {
                       onClick={() => navigate(`/curso/${course.id}`)}
                       className="btn btn-premium-primary w-100 d-flex align-items-center justify-content-center gap-2"
                     >
-                      Acessar Grade <ArrowRight size={16} />
+                      Acessar Detalhes <ArrowRight size={16} />
                     </button>
                   </div>
                 </div>
@@ -270,3 +262,4 @@ export default function Home() {
     </div>
   );
 }
+

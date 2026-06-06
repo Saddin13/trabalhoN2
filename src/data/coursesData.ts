@@ -21,43 +21,43 @@ export const COURSES_DATA: Course[] = [
         id: 'fs-m1',
         title: 'Módulo 1: Fundamentos do Next.js App Router',
         lessons: [
-          { id: 'fs-l1', title: 'Introdução ao ecossistema Next.js 15', duration: '15:20' },
-          { id: 'fs-l2', title: 'Server Components vs Client Components', duration: '28:45' },
-          { id: 'fs-l3', title: 'Layouts aninhados e Páginas Dinâmicas', duration: '32:10' }
+          { id: 'fs-l1', title: 'Introdução ao ecossistema Next.js 15', duration: '15:20', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'fs-l2', title: 'Server Components vs Client Components', duration: '28:45', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'fs-l3', title: 'Layouts aninhados e Páginas Dinâmicas', duration: '32:10', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       },
       {
         id: 'fs-m2',
         title: 'Módulo 2: Gerenciamento de Estado & Server Actions',
         lessons: [
-          { id: 'fs-l4', title: 'Mutando dados com Server Actions com segurança', duration: '25:15' },
-          { id: 'fs-l5', title: 'Validação schema-based com Zod', duration: '22:40' },
-          { id: 'fs-l6', title: 'Optimistic Updates para UX fluida', duration: '18:30' }
+          { id: 'fs-l4', title: 'Mutando dados com Server Actions com segurança', duration: '25:15', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'fs-l5', title: 'Validação schema-based com Zod', duration: '22:40', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'fs-l6', title: 'Optimistic Updates para UX fluida', duration: '18:30', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       },
       {
         id: 'fs-m3',
         title: 'Módulo 3: Integração de Banco de Dados & Prisma',
         lessons: [
-          { id: 'fs-l7', title: 'Modelando o banco de dados com PostgreSQL', duration: '30:00' },
-          { id: 'fs-l8', title: 'Relacionamentos de tabelas e Migrations', duration: '27:50' },
-          { id: 'fs-l9', title: 'Queries performáticas e Caching avançado', duration: '35:10' }
+          { id: 'fs-l7', title: 'Modelando o banco de dados com PostgreSQL', duration: '30:00', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'fs-l8', title: 'Relacionamentos de tabelas e Migrations', duration: '27:50', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'fs-l9', title: 'Queries performáticas e Caching avançado', duration: '35:10', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       },
       {
         id: 'fs-m4',
         title: 'Módulo 4: Autenticação Segura & Middlewares',
         lessons: [
-          { id: 'fs-l10', title: 'Autenticação multifator via NextAuth.js / Auth.js', duration: '40:15' },
-          { id: 'fs-l11', title: 'Protegendo rotas sensíveis com Middlewares', duration: '19:40' }
+          { id: 'fs-l10', title: 'Autenticação multifator via NextAuth.js / Auth.js', duration: '40:15', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'fs-l11', title: 'Protegendo rotas sensíveis com Middlewares', duration: '19:40', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       },
       {
         id: 'fs-m5',
         title: 'Módulo 5: Testes & Deploy de Alta Performance',
         lessons: [
-          { id: 'fs-l12', title: 'Testando Server Components com Vitest', duration: '24:10' },
-          { id: 'fs-l13', title: 'CI/CD e Deploy na Vercel com Otimizações', duration: '20:55' }
+          { id: 'fs-l12', title: 'Testando Server Components com Vitest', duration: '24:10', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'fs-l13', title: 'CI/CD e Deploy na Vercel com Otimizações', duration: '20:55', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       }
     ]
@@ -82,33 +82,33 @@ export const COURSES_DATA: Course[] = [
         id: 'ds-m1',
         title: 'Módulo 1: Anatomia de um Design System & Tokens',
         lessons: [
-          { id: 'ds-l1', title: 'O que é um Design System na prática empresarial?', duration: '18:40' },
-          { id: 'ds-l2', title: 'Figma Variables: Definindo tokens de cor e espaçamento', duration: '32:15' },
-          { id: 'ds-l3', title: 'Sistemas de Tipografia e Grades responsivas', duration: '25:10' }
+          { id: 'ds-l1', title: 'O que é um Design System na prática empresarial?', duration: '18:40', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'ds-l2', title: 'Figma Variables: Definindo tokens de cor e espaçamento', duration: '32:15', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'ds-l3', title: 'Sistemas de Tipografia e Grades responsivas', duration: '25:10', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       },
       {
         id: 'ds-m2',
         title: 'Módulo 2: Componentes Atômicos Avançados',
         lessons: [
-          { id: 'ds-l4', title: 'Botões robustos com múltiplos estados e variantes', duration: '29:50' },
-          { id: 'ds-l5', title: 'Inputs e feedbacks dinâmicos estruturados', duration: '27:40' }
+          { id: 'ds-l4', title: 'Botões robustos com múltiplos estados e variantes', duration: '29:50', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'ds-l5', title: 'Inputs e feedbacks dinâmicos estruturados', duration: '27:40', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       },
       {
         id: 'ds-m3',
         title: 'Módulo 3: Organismos & Templates Interativos',
         lessons: [
-          { id: 'ds-l6', title: 'Modais, Sidebars e tabelas complexas com Auto Layout', duration: '35:30' },
-          { id: 'ds-l7', title: 'Construindo protótipos de alta fidelidade baseados em tokens', duration: '22:15' }
+          { id: 'ds-l6', title: 'Modais, Sidebars e tabelas complexas com Auto Layout', duration: '35:30', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'ds-l7', title: 'Construindo protótipos de alta fidelidade baseados em tokens', duration: '22:15', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       },
       {
         id: 'ds-m4',
         title: 'Módulo 4: Governança & Handoff para Devs',
         lessons: [
-          { id: 'ds-l8', title: 'Documentando componentes e guias de uso no Figma', duration: '24:10' },
-          { id: 'ds-l9', title: 'Handoff perfeito usando CSS variables e tokens JSON', duration: '31:50' }
+          { id: 'ds-l8', title: 'Documentando componentes e guias de uso no Figma', duration: '24:10', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'ds-l9', title: 'Handoff perfeito usando CSS variables e tokens JSON', duration: '31:50', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       }
     ]
@@ -133,32 +133,32 @@ export const COURSES_DATA: Course[] = [
         id: 'dt-m1',
         title: 'Módulo 1: Pré-processamento & Análise Exploratória',
         lessons: [
-          { id: 'dt-l1', title: 'Pipelines eficientes de limpeza de dados com Pandas', duration: '28:10' },
-          { id: 'dt-l2', title: 'Engenharia de features para modelos preditivos', duration: '35:40' }
+          { id: 'dt-l1', title: 'Pipelines eficientes de limpeza de dados com Pandas', duration: '28:10', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'dt-l2', title: 'Engenharia de features para modelos preditivos', duration: '35:40', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       },
       {
         id: 'dt-m2',
         title: 'Módulo 2: Machine Learning e Avaliação de Modelos',
         lessons: [
-          { id: 'dt-l3', title: 'Algoritmos Supervisionados avançados', duration: '31:20' },
-          { id: 'dt-l4', title: 'Métricas de avaliação e validação cruzada k-fold', duration: '26:50' }
+          { id: 'dt-l3', title: 'Algoritmos Supervisionados avançados', duration: '31:20', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'dt-l4', title: 'Métricas de avaliação e validação cruzada k-fold', duration: '26:50', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       },
       {
         id: 'dt-m3',
         title: 'Módulo 3: Large Language Models (LLMs) & LangChain',
         lessons: [
-          { id: 'dt-l5', title: 'Entendendo Embeddings e Bancos de Dados Vetoriais', duration: '29:45' },
-          { id: 'dt-l6', title: 'Arquitetura RAG (Retrieval-Augmented Generation) com LangChain', duration: '38:15' }
+          { id: 'dt-l5', title: 'Entendendo Embeddings e Bancos de Dados Vetoriais', duration: '29:45', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'dt-l6', title: 'Arquitetura RAG (Retrieval-Augmented Generation) com LangChain', duration: '38:15', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       },
       {
         id: 'dt-m4',
         title: 'Módulo 4: Implantação e Monitoramento',
         lessons: [
-          { id: 'dt-l7', title: 'Empacotando modelos e APIs com FastAPI e Docker', duration: '34:00' },
-          { id: 'dt-l8', title: 'Monitoramento contra data-drift em produção', duration: '23:55' }
+          { id: 'dt-l7', title: 'Empacotando modelos e APIs com FastAPI e Docker', duration: '34:00', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'dt-l8', title: 'Monitoramento contra data-drift em produção', duration: '23:55', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       }
     ]
@@ -183,32 +183,32 @@ export const COURSES_DATA: Course[] = [
         id: 'rn-m1',
         title: 'Módulo 1: Setup do Expo & File-based Routing',
         lessons: [
-          { id: 'rn-l1', title: 'Instalando Expo CLI e configurando simuladores', duration: '22:15' },
-          { id: 'rn-l2', title: 'Navegação baseada em arquivos com Expo Router', duration: '28:30' }
+          { id: 'rn-l1', title: 'Instalando Expo CLI e configurando simuladores', duration: '22:15', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'rn-l2', title: 'Navegação baseada em arquivos com Expo Router', duration: '28:30', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       },
       {
         id: 'rn-m2',
         title: 'Módulo 2: Estilização Fluida & Temas',
         lessons: [
-          { id: 'rn-l3', title: 'Criando layouts dinâmicos com Flexbox e StyleSheet', duration: '20:10' },
-          { id: 'rn-l4', title: 'Gerenciando Temas Escuro e Claro nativos', duration: '24:50' }
+          { id: 'rn-l3', title: 'Criando layouts dinâmicos com Flexbox e StyleSheet', duration: '20:10', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'rn-l4', title: 'Gerenciando Temas Escuro e Claro nativos', duration: '24:50', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       },
       {
         id: 'rn-m3',
         title: 'Módulo 3: Animações e Performance',
         lessons: [
-          { id: 'rn-l5', title: 'Princípios do Reanimated e o Thread de UI', duration: '33:15' },
-          { id: 'rn-l6', title: 'Interações físicas de arrastar e pinçar com Gesture Handler', duration: '31:40' }
+          { id: 'rn-l5', title: 'Princípios do Reanimated e o Thread de UI', duration: '33:15', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'rn-l6', title: 'Interações físicas de arrastar e pinçar com Gesture Handler', duration: '31:40', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       },
       {
         id: 'rn-m4',
         title: 'Módulo 4: Recursos Nativos & Lançamento',
         lessons: [
-          { id: 'rn-l7', title: 'Acessando Câmera, Localização e Armazenamento Local', duration: '29:20' },
-          { id: 'rn-l8', title: 'Compilando e gerando builds de produção na EAS (Expo)', duration: '27:10' }
+          { id: 'rn-l7', title: 'Acessando Câmera, Localização e Armazenamento Local', duration: '29:20', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' },
+          { id: 'rn-l8', title: 'Compilando e gerando builds de produção na EAS (Expo)', duration: '27:10', videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk' }
         ]
       }
     ]
