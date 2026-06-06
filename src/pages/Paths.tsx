@@ -67,13 +67,14 @@ export default function Paths() {
                           >
                             {index + 1}
                           </div>
-                          
-                          <div className="premium-card-img-wrapper">
+                          <div className="flex-shrink-0" style={{ width: '100px', height: '100px' }}>
                             <img 
-                              src={course.image} 
+                              src={course.image && course.image.startsWith('http') ? course.image : `https://picsum.photos/seed/${course.id}/600/400`} 
                               alt={course.title} 
-                              className="premium-card-img"
-                              style={{ height: '140px' }}
+                              className="w-100 h-100 object-fit-cover rounded-3"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = `https://placehold.co/100x100/141B2D/FFFFFF?text=Curso`;
+                              }}
                             />
                           </div>
                           
