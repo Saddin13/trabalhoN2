@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   Search, BookOpen, Clock, Users, Star, ArrowRight, GraduationCap, TrendingUp, Award 
 } from 'lucide-react';
@@ -7,9 +7,9 @@ import { useData } from '../contexts/DataContext';
 
 export default function Home() {
   const navigate = useNavigate();
-  const { courses } = useData();
+  const { courses, categories } = useData();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [activeFilter, setActiveFilter] = useState('all');
 
   // Interactive metrics calculation
   const totalStudents = useMemo(() => {
@@ -29,11 +29,11 @@ export default function Home() {
                             course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                             course.instructorName.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const matchesCategory = selectedCategory === 'all' || course.category === selectedCategory;
+      const matchesCategory = activeFilter === 'all' || course.category === activeFilter;
 
       return matchesSearch && matchesCategory;
     });
-  }, [courses, searchTerm, selectedCategory]);
+  }, [courses, searchTerm, activeFilter]);
 
   return (
     <div className="container-fluid px-4 py-4">
@@ -50,13 +50,10 @@ export default function Home() {
             <p className="lead text-secondary mb-4 fs-5" style={{ maxWidth: '600px' }}>
               Explore programas de tecnologia aprofundados, desenvolvidos por líderes da indústria. Do zero ao nível sênior em engenharia de software, design e dados.
             </p>
-            <div className="d-flex flex-wrap gap-3">
-              <a href="#marketplace" className="btn btn-premium-primary d-inline-flex align-items-center gap-2">
-                Ver Cursos <ArrowRight size={18} />
-              </a>
-              <a href="#stats" className="btn btn-premium-secondary">
-                Ver Métricas
-              </a>
+            <div className="d-flex gap-3 justify-content-center">
+              <Link to="/paths" className="btn btn-premium-primary btn-lg px-5 shadow">
+                Ver Trilhas
+              </Link>
             </div>
           </div>
           <div className="col-lg-5 d-none d-lg-block text-center">
@@ -89,8 +86,8 @@ export default function Home() {
         <div className="col-md-4">
           <div className="glass-panel p-4 rounded-4 text-center text-md-start d-flex align-items-center justify-content-between">
             <div>
-              <p className="text-muted text-uppercase small mb-1 fw-bold tracking-wider">Cursos Disponíveis</p>
-              <h2 className="mb-0 display-font fw-extrabold">{courses.length}</h2>
+              <p className="text-white text-uppercase small mb-1 fw-bold tracking-wider">Cursos Disponíveis</p>
+              <h2 className="mb-0 display-font fw-extrabold text-white">{courses.length}</h2>
             </div>
             <div className="bg-primary bg-opacity-10 text-primary p-3 rounded-3">
               <BookOpen size={24} />
@@ -100,8 +97,8 @@ export default function Home() {
         <div className="col-md-4">
           <div className="glass-panel p-4 rounded-4 text-center text-md-start d-flex align-items-center justify-content-between">
             <div>
-              <p className="text-muted text-uppercase small mb-1 fw-bold tracking-wider">Alunos Ativos</p>
-              <h2 className="mb-0 display-font fw-extrabold">{totalStudents.toLocaleString()}+</h2>
+              <p className="text-white text-uppercase small mb-1 fw-bold tracking-wider">Alunos Ativos</p>
+              <h2 className="mb-0 display-font fw-extrabold text-white">{totalStudents.toLocaleString()}+</h2>
             </div>
             <div className="bg-info bg-opacity-10 text-info p-3 rounded-3">
               <Users size={24} />
@@ -111,8 +108,8 @@ export default function Home() {
         <div className="col-md-4">
           <div className="glass-panel p-4 rounded-4 text-center text-md-start d-flex align-items-center justify-content-between">
             <div>
-              <p className="text-muted text-uppercase small mb-1 fw-bold tracking-wider">Conteúdo Gravado</p>
-              <h2 className="mb-0 display-font fw-extrabold">{totalHours} Horas</h2>
+              <p className="text-white text-uppercase small mb-1 fw-bold tracking-wider">Conteúdo Gravado</p>
+              <h2 className="mb-0 display-font fw-extrabold text-white">{totalHours} Horas</h2>
             </div>
             <div className="bg-warning bg-opacity-10 text-warning p-3 rounded-3">
               <Clock size={24} />
@@ -122,13 +119,33 @@ export default function Home() {
       </div>
 
       {/* Course Marketplace Section */}
-      <div id="marketplace" className="row align-items-center mb-4">
-        <div className="col-lg-6 col-md-12 mb-3 mb-lg-0">
-          <h2 className="display-font fw-bold mb-1 text-white">Nosso Catálogo de Formações</h2>
-          <p className="text-secondary mb-0">Selecione uma categoria ou busque pelo assunto de sua escolha</p>
+      <div className="container" id="marketplace">
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
+          <div>
+            <h2 className="display-font fw-bold mb-2 text-white">Catálogo de Cursos</h2>
+            <p className="text-secondary mb-0">Expanda seus conhecimentos com nossos cursos especializados.</p>
+          </div>
+          
+          <div className="d-flex gap-2 overflow-auto pb-2 custom-scroll">
+            <button 
+              className={`category-pill ${activeFilter === 'all' ? 'active' : ''}`}
+              onClick={() => setActiveFilter('all')}
+            >
+              Todos
+            </button>
+            {categories.map(cat => (
+              <button 
+                key={cat.id}
+                className={`category-pill ${activeFilter === cat.id ? 'active' : ''}`}
+                onClick={() => setActiveFilter(cat.id)}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="col-lg-6 col-md-12">
-          {/* Glass Search Input */}
+
+        <div className="mb-4">
           <div className="position-relative">
             <Search className="position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary" size={20} />
             <input 
@@ -142,33 +159,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Category Pills Navigation */}
-      <div className="d-flex flex-wrap gap-2 mb-4 pb-2">
-        <button 
-          onClick={() => setSelectedCategory('all')} 
-          className={`category-pill ${selectedCategory === 'all' ? 'active' : ''}`}
-        >
-          Todos os Cursos
-        </button>
-        <button 
-          onClick={() => setSelectedCategory('programming')} 
-          className={`category-pill ${selectedCategory === 'programming' ? 'active' : ''}`}
-        >
-          Programação
-        </button>
-        <button 
-          onClick={() => setSelectedCategory('design')} 
-          className={`category-pill ${selectedCategory === 'design' ? 'active' : ''}`}
-        >
-          Design & UI/UX
-        </button>
-        <button 
-          onClick={() => setSelectedCategory('data')} 
-          className={`category-pill ${selectedCategory === 'data' ? 'active' : ''}`}
-        >
-          Dados & Inteligência Artificial
-        </button>
-      </div>
+
 
       {/* Courses Cards Grid */}
       {filteredCourses.length > 0 ? (
@@ -178,11 +169,11 @@ export default function Home() {
               <div className="premium-card h-100">
                 <div className="premium-card-img-wrapper">
                   <img 
-                    src={course.image} 
+                    src={course.image && course.image.startsWith('http') ? course.image : `https://picsum.photos/seed/${course.id}/600/400`} 
                     alt={course.title} 
                     className="premium-card-img"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop';
+                      (e.target as HTMLImageElement).src = `https://placehold.co/600x400/141B2D/FFFFFF?text=${encodeURIComponent(course.title)}`;
                     }}
                   />
                   {/* Category Badge overlay */}
@@ -252,7 +243,7 @@ export default function Home() {
             Não encontramos resultados para a sua busca ou filtros selecionados. Tente ajustar os termos ou selecionar outra categoria.
           </p>
           <button 
-            onClick={() => { setSearchTerm(''); setSelectedCategory('all'); }} 
+            onClick={() => { setSearchTerm(''); setActiveFilter('all'); }} 
             className="btn btn-premium-primary btn-sm mt-2"
           >
             Resetar Filtros

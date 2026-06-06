@@ -1,17 +1,22 @@
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Star, Clock, Users, Award, Shield, Smartphone, ChevronRight, CheckCircle
 } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
+import CheckoutModal from '../components/CheckoutModal';
 
 export default function CourseDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { courses } = useData();
   const { user, enrollCourse } = useAuth();
+  const { showToast } = useToast();
   
+  const [showCheckout, setShowCheckout] = useState(false);
+
   const course = useMemo(() => {
     return courses.find(c => c.id === id);
   }, [id, courses]);
@@ -32,13 +37,17 @@ export default function CourseDetail() {
 
   const isEnrolled = user?.enrolledCourses.includes(course.id) || false;
 
-  const handleEnroll = () => {
+  const handleEnrollClick = () => {
     if (!user) {
-      alert('Você precisa criar uma conta ou fazer login para comprar este curso.');
+      showToast('Você precisa criar uma conta ou fazer login para comprar este curso.', 'error');
       return;
     }
-    enrollCourse(course.id);
-    alert('Matrícula realizada com sucesso! Você pode assistir às aulas na aba "Aulas".');
+    setShowCheckout(true);
+  };
+
+  const handleEnrollSuccess = () => {
+    setShowCheckout(false);
+    navigate('/aulas');
   };
 
   const totalLessonsCount = course.modules.reduce((sum, mod) => sum + mod.lessons.length, 0);
@@ -146,7 +155,15 @@ export default function CourseDetail() {
           <div className="position-sticky" style={{ top: '2rem' }}>
             <div className="glass-panel p-4 rounded-4 mb-4 border border-secondary border-opacity-10">
               <div className="premium-card-img-wrapper rounded-3 mb-4">
-                <img src={course.image} alt={course.title} className="w-100" style={{ height: '180px', objectFit: 'cover' }} />
+                <img 
+                  src={course.image && course.image.startsWith('http') ? course.image : `https://picsum.photos/seed/${course.id}/600/400`} 
+                  alt={course.title} 
+                  className="w-100" 
+                  style={{ height: '180px', objectFit: 'cover' }} 
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = `https://placehold.co/600x180/141B2D/FFFFFF?text=${encodeURIComponent(course.title)}`;
+                  }}
+                />
               </div>
 
               <div className="d-grid gap-3">
@@ -155,7 +172,7 @@ export default function CourseDetail() {
                     Ir para Minhas Aulas
                   </button>
                 ) : (
-                  <button onClick={handleEnroll} className="btn btn-premium-primary py-3">
+                  <button onClick={handleEnrollClick} className="btn btn-premium-primary py-3">
                     Comprar Curso / Matricular
                   </button>
                 )}
@@ -203,6 +220,14 @@ export default function CourseDetail() {
           </div>
         </div>
       </div>
+
+      {showCheckout && (
+        <CheckoutModal 
+          course={course} 
+          onClose={() => setShowCheckout(false)} 
+          onSuccess={handleEnrollSuccess} 
+        />
+      )}
     </div>
   );
 }

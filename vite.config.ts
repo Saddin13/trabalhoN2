@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   base: './', // Fix absoluto para GitHub Pages (Caminho relativo)
   server: {
-    port: 3000,
+    port: 5173,
     open: true
   }
 });

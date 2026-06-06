@@ -1,34 +1,36 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { X, LogIn, UserPlus } from 'lucide-react';
+import { LogIn, UserPlus } from 'lucide-react';
 
 interface LoginModalProps {
   onClose: () => void;
 }
 
 export default function LoginModal({ onClose }: LoginModalProps) {
-  const { users, login, register } = useAuth();
+  const { login, register } = useAuth();
   const [isRegistering, setIsRegistering] = useState(false);
   
   // Login State
-  const [selectedEmail, setSelectedEmail] = useState('');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   
   // Register State
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [registerPassword, setRegisterPassword] = useState('');
   const [role, setRole] = useState<'student' | 'admin'>('student');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedEmail) return;
-    login(selectedEmail);
+    if (!loginEmail || !loginPassword) return;
+    login(loginEmail, loginPassword);
     onClose();
   };
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !email) return;
-    register(name, email, role);
+    if (!name || !email || !registerPassword) return;
+    register(name, email, registerPassword, role);
     onClose();
   };
 
@@ -46,20 +48,29 @@ export default function LoginModal({ onClose }: LoginModalProps) {
           <div className="modal-body p-4">
             {!isRegistering ? (
               <form onSubmit={handleLogin}>
-                <div className="mb-4">
-                  <label className="form-label text-secondary small text-uppercase tracking-wider">Selecione uma conta</label>
-                  <select 
-                    className="form-select border-secondary text-white" 
+                <div className="mb-3">
+                  <label className="form-label text-secondary small text-uppercase tracking-wider">E-mail</label>
+                  <input 
+                    type="email"
+                    className="form-control border-secondary text-white" 
                     style={{ backgroundColor: '#141B2D' }}
-                    value={selectedEmail} 
-                    onChange={e => setSelectedEmail(e.target.value)}
+                    value={loginEmail} 
+                    onChange={e => setLoginEmail(e.target.value)}
+                    placeholder="Digite seu e-mail"
                     required
-                  >
-                    <option value="" disabled>Escolha um usuário...</option>
-                    {users.map(u => (
-                      <option key={u.id} value={u.email}>{u.name} ({u.role}) - {u.email}</option>
-                    ))}
-                  </select>
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className="form-label text-secondary small text-uppercase tracking-wider">Senha</label>
+                  <input 
+                    type="password"
+                    className="form-control border-secondary text-white" 
+                    style={{ backgroundColor: '#141B2D' }}
+                    value={loginPassword} 
+                    onChange={e => setLoginPassword(e.target.value)}
+                    placeholder="Sua senha"
+                    required
+                  />
                 </div>
                 <button type="submit" className="btn btn-premium-primary w-100 d-flex align-items-center justify-content-center gap-2">
                   <LogIn size={18} /> Entrar
@@ -91,6 +102,17 @@ export default function LoginModal({ onClose }: LoginModalProps) {
                     style={{ backgroundColor: '#141B2D' }}
                     value={email}
                     onChange={e => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label text-secondary small">Senha</label>
+                  <input 
+                    type="password" 
+                    className="form-control border-secondary text-white" 
+                    style={{ backgroundColor: '#141B2D' }}
+                    value={registerPassword}
+                    onChange={e => setRegisterPassword(e.target.value)}
                     required
                   />
                 </div>

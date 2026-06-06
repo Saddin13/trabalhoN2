@@ -15,12 +15,15 @@ import AdminDashboard from './pages/AdminDashboard';
 import PlaceholderPage from './pages/PlaceholderPage';
 import LoginModal from './components/LoginModal';
 
+import PasswordResetModal from './components/PasswordResetModal';
+import { ReactNode } from 'react';
+
 // Protected Route wrapper
-function ProtectedRoute({ children, adminOnly = false }: { children: JSX.Element, adminOnly?: boolean }) {
+function ProtectedRoute({ children, adminOnly = false }: { children: ReactNode, adminOnly?: boolean }) {
   const { user, isAdmin } = useAuth();
   if (!user) return <Navigate to="/" replace />;
   if (adminOnly && !isAdmin) return <Navigate to="/" replace />;
-  return children;
+  return <>{children}</>;
 }
 
 function AppContent() {
@@ -113,6 +116,7 @@ function AppContent() {
       </main>
 
       {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
+      {user?.needsPasswordReset && <PasswordResetModal />}
     </div>
   );
 }

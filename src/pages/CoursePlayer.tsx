@@ -3,13 +3,23 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Play, CheckCircle, ChevronRight, Award } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 import { Lesson } from '../types';
+
+import YouTube, { YouTubeProps } from 'react-youtube';
+
+// Helper para extrair o ID do vídeo da URL
+const extractVideoId = (url: string) => {
+  const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})/);
+  return match ? match[1] : null;
+};
 
 export default function CoursePlayer() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { courses } = useData();
   const { user, completeLesson, issueCertificate } = useAuth();
+  const { showToast } = useToast();
   const [selectedVideo, setSelectedVideo] = useState<Lesson | null>(null);
 
   const course = useMemo(() => courses.find(c => c.id === id), [id, courses]);
@@ -42,8 +52,8 @@ export default function CoursePlayer() {
 
   const totalLessonsCount = course.modules.reduce((sum, mod) => sum + mod.lessons.length, 0);
 
-  const handleToggleLesson = (lessonId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleToggleLesson = (lessonId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     completeLesson(lessonId, course.id, totalLessonsCount, course.title);
   };
 
@@ -51,9 +61,18 @@ export default function CoursePlayer() {
     if (lesson.videoUrl) {
       setSelectedVideo(lesson);
     } else {
-      alert("Nenhum vídeo disponível para esta aula.");
+      showToast("Nenhum vídeo disponível para esta aula.", "error");
     }
   };
+
+  const onPlayerEnd: YouTubeProps['onEnd'] = (event) => {
+    if (selectedVideo && !user.completedLessons.includes(selectedVideo.id)) {
+      handleToggleLesson(selectedVideo.id);
+      showToast("Aula concluída automaticamente!", "success");
+    }
+  };
+
+  const videoId = selectedVideo ? extractVideoId(selectedVideo.videoUrl) : null;
 
   return (
     <div className="container-fluid px-4 py-4 position-relative">
@@ -149,13 +168,22 @@ export default function CoursePlayer() {
               <button className="btn-close btn-close-white" onClick={() => setSelectedVideo(null)}></button>
             </div>
             <div className="ratio ratio-16x9 rounded-4 overflow-hidden shadow-lg border border-secondary border-opacity-25 bg-black">
-              <iframe 
-                src={selectedVideo.videoUrl} 
-                title="YouTube video player" 
-                frameBorder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                allowFullScreen
-              ></iframe>
+              {videoId ? (
+                <YouTube 
+                  videoId={videoId} 
+                  onEnd={onPlayerEnd} 
+                  opts={{ width: '100%', height: '100%', playerVars: { autoplay: 1 } }} 
+                  className="w-100 h-100"
+                />
+              ) : (
+                <iframe 
+                  src={selectedVideo.videoUrl} 
+                  title="YouTube video player" 
+                  frameBorder="0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowFullScreen
+                ></iframe>
+              )}
             </div>
             <div className="mt-4 text-center">
               <button 
@@ -167,7 +195,7 @@ export default function CoursePlayer() {
                   setSelectedVideo(null);
                 }}
               >
-                Concluir Aula e Fechar
+                Marcar como Concluída Manualmente e Fechar
               </button>
             </div>
           </div>
