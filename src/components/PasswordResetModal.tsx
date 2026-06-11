@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { Lock } from 'lucide-react';
+import { updatePassword } from '../services/authService';
 
 export default function PasswordResetModal() {
-  const { updatePassword } = useAuth();
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword.length < 6) {
       setError('A senha deve ter pelo menos 6 caracteres.');
@@ -18,7 +16,10 @@ export default function PasswordResetModal() {
       setError('As senhas não coincidem.');
       return;
     }
-    updatePassword(newPassword);
+    const ok = await updatePassword(newPassword);
+    if (!ok) {
+      setError('Erro ao redefinir a senha.');
+    }
   };
 
   return (
@@ -27,7 +28,7 @@ export default function PasswordResetModal() {
         <div className="modal-content bg-dark text-white border-warning border-opacity-50">
           <div className="modal-header border-warning border-opacity-25 bg-warning bg-opacity-10">
             <h5 className="modal-title fw-bold d-flex align-items-center text-warning">
-              <Lock className="me-2" size={20} />
+              <i className="bi bi-lock-fill me-2 fs-5"></i>
               Redefinição de Senha Necessária
             </h5>
           </div>

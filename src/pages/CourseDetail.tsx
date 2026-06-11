@@ -1,21 +1,34 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, Star, Clock, Users, Award, Shield, Smartphone, ChevronRight, CheckCircle
-} from 'lucide-react';
-import { useData } from '../contexts/DataContext';
-import { useAuth } from '../contexts/AuthContext';
+import { fetchAllData } from '../services/dataService';
+import { getSession } from '../services/authService';
 import { useToast } from '../contexts/ToastContext';
 import CheckoutModal from '../components/CheckoutModal';
+import { Course } from '../types';
 
 export default function CourseDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { courses } = useData();
-  const { user, enrollCourse } = useAuth();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const user = getSession();
   const { showToast } = useToast();
   
   const [showCheckout, setShowCheckout] = useState(false);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await fetchAllData();
+        setCourses(data.courses);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    load();
+    const handleDataChange = () => load();
+    window.addEventListener('data_change', handleDataChange);
+    return () => window.removeEventListener('data_change', handleDataChange);
+  }, []);
 
   const course = useMemo(() => {
     return courses.find(c => c.id === id);
@@ -50,8 +63,6 @@ export default function CourseDetail() {
     navigate('/aulas');
   };
 
-  const totalLessonsCount = course.modules.reduce((sum, mod) => sum + mod.lessons.length, 0);
-
   return (
     <div className="container-fluid px-4 py-4">
       {/* Breadcrumb Navigation */}
@@ -60,9 +71,9 @@ export default function CourseDetail() {
           onClick={() => navigate('/cursos')} 
           className="btn btn-link text-secondary p-0 d-flex align-items-center gap-1 text-decoration-none border-0 fs-6 hover-white"
         >
-          <ArrowLeft size={16} /> Catálogo
+          <i className="bi bi-arrow-left"></i> Catálogo
         </button>
-        <ChevronRight size={14} className="text-muted" />
+        <i className="bi bi-chevron-right text-muted small"></i>
         <span className="text-muted text-truncate" style={{ maxWidth: '250px' }}>{course.title}</span>
       </div>
 
@@ -75,21 +86,21 @@ export default function CourseDetail() {
 
             <div className="row g-3 text-secondary pt-3 border-top border-light border-opacity-10">
               <div className="col-sm-4 d-flex align-items-center gap-2">
-                <Star size={18} fill="#F59E0B" className="text-warning" />
+                <i className="bi bi-star-fill text-warning fs-5"></i>
                 <div>
                   <strong className="text-white d-block">{course.rating} de 5.0</strong>
                   <span className="small">Avaliações reais</span>
                 </div>
               </div>
               <div className="col-sm-4 d-flex align-items-center gap-2">
-                <Users size={18} className="text-primary" />
+                <i className="bi bi-people text-primary fs-5"></i>
                 <div>
                   <strong className="text-white d-block">{course.studentsCount.toLocaleString()}</strong>
                   <span className="small">Alunos matriculados</span>
                 </div>
               </div>
               <div className="col-sm-4 d-flex align-items-center gap-2">
-                <Clock size={18} className="text-info" />
+                <i className="bi bi-clock text-info fs-5"></i>
                 <div>
                   <strong className="text-white d-block">{course.duration}</strong>
                   <span className="small">Carga horária total</span>
@@ -137,7 +148,7 @@ export default function CourseDetail() {
                       <ul className="list-group list-group-flush bg-transparent">
                         {mod.lessons.map(lesson => (
                           <li key={lesson.id} className="list-group-item bg-transparent border-secondary border-opacity-25 text-white d-flex justify-content-between">
-                            <span><CheckCircle size={14} className="text-info me-2" /> {lesson.title}</span>
+                            <span><i className="bi bi-check-circle-fill text-info me-2"></i> {lesson.title}</span>
                             <span className="text-muted small">{lesson.duration}</span>
                           </li>
                         ))}
@@ -183,15 +194,15 @@ export default function CourseDetail() {
                 <h6 className="text-white fw-bold mb-3 small text-uppercase tracking-wider">Esta formação inclui:</h6>
                 <div className="d-grid gap-2.5">
                   <div className="d-flex align-items-center gap-2.5 text-secondary small">
-                    <Award size={16} className="text-primary" />
+                    <i className="bi bi-award text-primary fs-6"></i>
                     <span>Acesso vitalício ao material</span>
                   </div>
                   <div className="d-flex align-items-center gap-2.5 text-secondary small">
-                    <Shield size={16} className="text-info" />
+                    <i className="bi bi-shield-check text-info fs-6"></i>
                     <span>Certificado de Conclusão Assinado</span>
                   </div>
                   <div className="d-flex align-items-center gap-2.5 text-secondary small">
-                    <Smartphone size={16} className="text-warning" />
+                    <i className="bi bi-phone text-warning fs-6"></i>
                     <span>Compatível com Web e Mobile</span>
                   </div>
                 </div>

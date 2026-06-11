@@ -1,10 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Play, CheckCircle, ChevronRight, Award } from 'lucide-react';
-import { useData } from '../contexts/DataContext';
-import { useAuth } from '../contexts/AuthContext';
+import { fetchAllData } from '../services/dataService';
+import { getSession } from '../services/authService';
+import { completeLesson, issueCertificate } from '../services/userService';
 import { useToast } from '../contexts/ToastContext';
-import { Lesson } from '../types';
+import { Lesson, Course } from '../types';
 
 import YouTube, { YouTubeProps } from 'react-youtube';
 
@@ -17,24 +17,42 @@ const extractVideoId = (url: string) => {
 export default function CoursePlayer() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { courses } = useData();
-  const { user, completeLesson, issueCertificate } = useAuth();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const user = getSession();
   const { showToast } = useToast();
   const [selectedVideo, setSelectedVideo] = useState<Lesson | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await fetchAllData();
+        setCourses(data.courses);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    load();
+    const handleDataChange = () => load();
+    window.addEventListener('data_change', handleDataChange);
+    return () => window.removeEventListener('data_change', handleDataChange);
+  }, []);
 
   const course = useMemo(() => courses.find(c => c.id === id), [id, courses]);
 
   // Verificar e emitir certificado se 100%
   useEffect(() => {
     if (!course || !user) return;
-    const totalLessons = course.modules.reduce((sum, mod) => sum + mod.lessons.length, 0);
-    const courseLessonIds = course.modules.flatMap(m => m.lessons.map(l => l.id));
-    const completedForThisCourse = user.completedLessons.filter(lId => courseLessonIds.includes(lId));
-    
-    if (totalLessons > 0 && completedForThisCourse.length === totalLessons) {
-      issueCertificate(course.id, course.title);
-    }
-  }, [user?.completedLessons, course, user, issueCertificate]);
+    const checkCert = async () => {
+      const totalLessons = course.modules.reduce((sum, mod) => sum + mod.lessons.length, 0);
+      const courseLessonIds = course.modules.flatMap(m => m.lessons.map(l => l.id));
+      const completedForThisCourse = user.completedLessons.filter(lId => courseLessonIds.includes(lId));
+      
+      if (totalLessons > 0 && ) {
+        await issueCertificate(course.id, course.title);completedForThisCourse.length === totalLessons
+      }
+    };
+    checkCert();
+  }, [user?.completedLessons.length, course, user]);
 
   if (!course || !user || !user.enrolledCourses.includes(course.id)) {
     return (
@@ -52,9 +70,9 @@ export default function CoursePlayer() {
 
   const totalLessonsCount = course.modules.reduce((sum, mod) => sum + mod.lessons.length, 0);
 
-  const handleToggleLesson = (lessonId: string, e?: React.MouseEvent) => {
+  const handleToggleLesson = async (lessonId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
-    completeLesson(lessonId, course.id, totalLessonsCount, course.title);
+    await completeLesson(lessonId, course.id, totalLessonsCount, course.title);
   };
 
   const handlePlayVideo = (lesson: Lesson) => {
@@ -65,14 +83,14 @@ export default function CoursePlayer() {
     }
   };
 
-  const onPlayerEnd: YouTubeProps['onEnd'] = (event) => {
+  const onPlayerEnd: YouTubeProps['onEnd'] = async () => {
     if (selectedVideo && !user.completedLessons.includes(selectedVideo.id)) {
-      handleToggleLesson(selectedVideo.id);
+      await handleToggleLesson(selectedVideo.id);
       showToast("Aula concluída automaticamente!", "success");
     }
   };
 
-  const videoId = selectedVideo ? extractVideoId(selectedVideo.videoUrl) : null;
+  const videoId = selectedVideo ? extractVideoId(selectedVideo.videoUrl || '') : null;
 
   return (
     <div className="container-fluid px-4 py-4 position-relative">
@@ -81,9 +99,9 @@ export default function CoursePlayer() {
           onClick={() => navigate('/aulas')} 
           className="btn btn-link text-secondary p-0 d-flex align-items-center gap-1 text-decoration-none border-0 fs-6 hover-white"
         >
-          <ArrowLeft size={16} /> Minhas Aulas
+          <i className="bi bi-arrow-left"></i> Minhas Aulas
         </button>
-        <ChevronRight size={14} className="text-muted" />
+        <i className="bi bi-chevron-right text-muted small"></i>
         <span className="text-muted text-truncate" style={{ maxWidth: '250px' }}>{course.title}</span>
       </div>
 
@@ -130,9 +148,9 @@ export default function CoursePlayer() {
                                   onClick={(e) => handleToggleLesson(lesson.id, e)}
                                 >
                                   {isCompleted ? (
-                                    <CheckCircle size={24} fill="#10B981" className="text-white" />
+                                    <i className="bi bi-check-circle-fill text-success fs-5"></i>
                                   ) : (
-                                    <div className="border border-secondary border-opacity-50 rounded-circle" style={{ width: '24px', height: '24px' }}></div>
+                                    <div className="border border-secondary border-opacity-50 rounded-circle" style={{ width: '20px', height: '20px' }}></div>
                                   )}
                                 </button>
                                 
@@ -144,7 +162,7 @@ export default function CoursePlayer() {
                                 <span className="badge bg-secondary bg-opacity-20 text-secondary small px-2 py-1">
                                   {lesson.duration}
                                 </span>
-                                <Play size={18} className="text-info" />
+                                <i className="bi bi-play-fill text-info fs-5"></i>
                               </div>
                             </div>
                           );
@@ -188,9 +206,9 @@ export default function CoursePlayer() {
             <div className="mt-4 text-center">
               <button 
                 className="btn btn-premium-primary"
-                onClick={(e) => {
+                onClick={async (e) => {
                   if (!user.completedLessons.includes(selectedVideo.id)) {
-                    handleToggleLesson(selectedVideo.id, e as any);
+                    await handleToggleLesson(selectedVideo.id, e as any);
                   }
                   setSelectedVideo(null);
                 }}

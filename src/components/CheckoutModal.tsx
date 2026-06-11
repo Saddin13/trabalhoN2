@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Course } from '../types';
-import { useAuth } from '../contexts/AuthContext';
+import { enrollCourse } from '../services/userService';
 import { useToast } from '../contexts/ToastContext';
-import { CreditCard, Lock, CheckCircle2 } from 'lucide-react';
 
 interface CheckoutModalProps {
   course: Course;
@@ -11,7 +10,6 @@ interface CheckoutModalProps {
 }
 
 export default function CheckoutModal({ course, onClose, onSuccess }: CheckoutModalProps) {
-  const { enrollCourse } = useAuth();
   const { showToast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -34,7 +32,7 @@ export default function CheckoutModal({ course, onClose, onSuccess }: CheckoutMo
         <div className="modal-content bg-dark text-white border-secondary border-opacity-25">
           <div className="modal-header border-secondary border-opacity-25">
             <h5 className="modal-title fw-bold d-flex align-items-center">
-              <Lock className="me-2 text-warning" size={20} />
+              <i className="bi bi-lock-fill me-2 text-warning fs-5"></i>
               Finalizar Compra Seguro
             </h5>
             <button type="button" className="btn-close btn-close-white" onClick={onClose} disabled={loading}></button>
@@ -66,7 +64,7 @@ export default function CheckoutModal({ course, onClose, onSuccess }: CheckoutMo
                 <label className="form-label text-secondary small">Número do Cartão</label>
                 <div className="input-group">
                   <span className="input-group-text bg-dark border-secondary border-opacity-25 text-secondary">
-                    <CreditCard size={18} />
+                    <i className="bi bi-credit-card"></i>
                   </span>
                   <input type="text" className="form-control glass-input text-white border-start-0" placeholder="0000 0000 0000 0000" maxLength={19} required disabled={loading} />
                 </div>
@@ -83,7 +81,7 @@ export default function CheckoutModal({ course, onClose, onSuccess }: CheckoutMo
               </div>
 
               <div className="d-flex align-items-center mb-3">
-                <CheckCircle2 size={16} className="text-success me-2" />
+                <i className="bi bi-check-circle-fill text-success me-2"></i>
                 <small className="text-secondary">Seus dados estão protegidos por criptografia de ponta a ponta.</small>
               </div>
 

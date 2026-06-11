@@ -1,5 +1,22 @@
 {
-  "usuarios": [],
+  "usuarios": [
+    {
+      "id": "0Q40Ks0D86g",
+      "NomeCompleto": "admin",
+      "Email": "saddi@saddi",
+      "SenhaHash": "1234",
+      "DataCadastro": "2026-06-10T23:40:19.887Z",
+      "Role": "admin"
+    },
+    {
+      "id": "FIG4udUfV08",
+      "NomeCompleto": "sadd",
+      "Email": "sad@sad",
+      "SenhaHash": "12345",
+      "DataCadastro": "2026-06-10T23:54:52.896Z",
+      "Role": "student"
+    }
+  ],
   "categorias": [
     {
       "id": "cat-programming",
@@ -209,8 +226,23 @@
       "Ordem": 1
     }
   ],
-  "matriculas": [],
-  "progresso_aulas": [],
+  "matriculas": [
+    {
+      "id": "uA2yyPWsPb8",
+      "ID_Usuario": "user-1781134819887",
+      "ID_Curso": "design-systems-uiux",
+      "DataMatricula": "2026-06-10T23:40:50.916Z"
+    }
+  ],
+  "progresso_aulas": [
+    {
+      "id": "QaKCXUJK1D4",
+      "ID_Usuario": "user-1781134819887",
+      "ID_Aula": "ds-l1",
+      "DataConclusao": "2026-06-10T23:40:56.680Z",
+      "Status": "Concluído"
+    }
+  ],
   "avaliacoes": [],
   "trilhas": [
     {
@@ -282,7 +314,15 @@
       "Ordem": 3
     }
   ],
-  "certificados": [],
+  "certificados": [
+    {
+      "id": "BojUWiCSnWI",
+      "ID_Usuario": "user-1781134819887",
+      "ID_Curso": "design-systems-uiux",
+      "CodigoVerificacao": "FY05IHFC",
+      "DataEmissao": "2026-06-10"
+    }
+  ],
   "planos": [
     {
       "id": "plano-1",
@@ -300,5 +340,6 @@
     }
   ],
   "assinaturas": [],
-  "pagamentos": []
+  "pagamentos": [],
+  "$schema": "./node_modules/json-server/schema.json"
 }

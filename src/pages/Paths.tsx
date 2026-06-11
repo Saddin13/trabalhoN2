@@ -1,10 +1,28 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, ArrowRight, PlayCircle } from 'lucide-react';
-import { useData } from '../contexts/DataContext';
+import { fetchAllData } from '../services/dataService';
+import { Course, LearningPath } from '../types';
 
 export default function Paths() {
-  const { paths, courses } = useData();
   const navigate = useNavigate();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [paths, setPaths] = useState<LearningPath[]>([]);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await fetchAllData();
+        setCourses(data.courses);
+        setPaths(data.paths);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    load();
+    const handleDataChange = () => load();
+    window.addEventListener('data_change', handleDataChange);
+    return () => window.removeEventListener('data_change', handleDataChange);
+  }, []);
 
   return (
     <div className="container-fluid px-4 py-4">
@@ -20,7 +38,7 @@ export default function Paths() {
 
       {paths.length === 0 ? (
         <div className="glass-panel p-5 text-center rounded-4 border border-dashed border-secondary border-opacity-25 my-5">
-          <BookOpen size={64} className="text-muted mb-3" />
+          <i className="bi bi-book fs-1 text-muted mb-3 d-block"></i>
           <h4 className="text-white fw-bold">Nenhuma trilha encontrada</h4>
           <p className="text-secondary mx-auto" style={{ maxWidth: '400px' }}>
             Ainda não há trilhas de aprendizado disponíveis.
@@ -32,7 +50,7 @@ export default function Paths() {
             // Pegar os dados reais de cada curso da trilha
             const pathCourses = path.coursesIds
               .map(id => courses.find(c => c.id === id))
-              .filter(Boolean) as typeof courses;
+              .filter(Boolean) as Course[];
 
             return (
               <div key={path.id} className="glass-panel p-4 p-md-5 rounded-4 position-relative overflow-hidden">
@@ -59,7 +77,7 @@ export default function Paths() {
                   <div className="row g-4 position-relative z-3">
                     {pathCourses.map((course, index) => (
                       <div className="col-lg col-md-6" key={course.id}>
-                        <div className="premium-card h-100 position-relative">
+                        <div className="premium-card h-100 position-relative d-flex flex-column align-items-center justify-content-between p-3 text-center">
                           {/* Número do Passo */}
                           <div 
                             className="position-absolute top-0 start-50 translate-middle rounded-circle d-flex align-items-center justify-content-center bg-dark border border-primary text-primary fw-bold"
@@ -67,7 +85,7 @@ export default function Paths() {
                           >
                             {index + 1}
                           </div>
-                          <div className="flex-shrink-0" style={{ width: '100px', height: '100px' }}>
+                          <div className="flex-shrink-0 mb-3" style={{ width: '100px', height: '100px' }}>
                             <img 
                               src={course.image && course.image.startsWith('http') ? course.image : `https://picsum.photos/seed/${course.id}/600/400`} 
                               alt={course.title} 
@@ -78,18 +96,18 @@ export default function Paths() {
                             />
                           </div>
                           
-                          <div className="card-body p-3 text-center d-flex flex-column justify-content-between h-100">
-                            <div>
+                          <div className="w-100 d-flex flex-column align-items-center justify-content-between flex-grow-1">
+                            <div className="w-100 mb-3">
                               <span className="badge bg-dark bg-opacity-50 text-secondary mb-2 small">{course.level}</span>
-                              <h6 className="card-title text-white fw-bold text-truncate-2 mb-3" style={{ minHeight: '40px' }}>
+                              <h6 className="card-title text-white fw-bold text-truncate-2 mb-0" style={{ minHeight: '40px' }}>
                                 {course.title}
                               </h6>
                             </div>
                             <button 
                               onClick={() => navigate(`/curso/${course.id}`)}
-                              className="btn btn-outline-primary btn-sm w-100 d-flex align-items-center justify-content-center gap-1"
+                              className="btn btn-outline-primary btn-sm w-100 d-flex align-items-center justify-content-center gap-2"
                             >
-                              Ver Detalhes <ArrowRight size={14} />
+                              Ver Detalhes <i className="bi bi-arrow-right"></i>
                             </button>
                           </div>
                         </div>

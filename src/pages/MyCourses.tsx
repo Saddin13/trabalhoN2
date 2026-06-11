@@ -1,12 +1,28 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { useData } from '../contexts/DataContext';
-import { Play, BookOpen, CheckCircle } from 'lucide-react';
+import { getSession } from '../services/authService';
+import { fetchAllData } from '../services/dataService';
+import { Course } from '../types';
 
 export default function MyCourses() {
-  const { user } = useAuth();
-  const { courses } = useData();
+  const user = getSession();
+  const [courses, setCourses] = useState<Course[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await fetchAllData();
+        setCourses(data.courses);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    load();
+    const handleDataChange = () => load();
+    window.addEventListener('data_change', handleDataChange);
+    return () => window.removeEventListener('data_change', handleDataChange);
+  }, []);
 
   if (!user) return null;
 
@@ -33,7 +49,7 @@ export default function MyCourses() {
 
       {enrolledCourses.length === 0 ? (
         <div className="glass-panel p-5 text-center rounded-4 border border-dashed border-secondary border-opacity-25">
-          <BookOpen size={64} className="text-muted mb-3" />
+          <i className="bi bi-book fs-1 text-muted mb-3 d-block"></i>
           <h4 className="text-white fw-bold">Nenhum curso adquirido</h4>
           <p className="text-secondary">Você ainda não se matriculou em nenhum curso.</p>
           <button onClick={() => navigate('/cursos')} className="btn btn-premium-primary mt-3">
@@ -67,7 +83,7 @@ export default function MyCourses() {
                     onClick={() => navigate(`/aulas/${course.id}`)} 
                     className="btn btn-premium-secondary w-100 mt-2 d-flex align-items-center justify-content-center gap-2"
                   >
-                    <Play size={16} /> Assistir Aulas
+                    <i className="bi bi-play-fill"></i> Assistir Aulas
                   </button>
                 </div>
               </div>

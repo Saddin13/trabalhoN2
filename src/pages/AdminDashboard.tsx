@@ -1,21 +1,35 @@
-import { useState } from 'react';
-import { useData } from '../contexts/DataContext';
-import { useAuth } from '../contexts/AuthContext';
-import { Course, LearningPath } from '../types';
-import { Settings, Users, BookOpen, Map } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Course, LearningPath, User } from '../types';
 import { useToast } from '../contexts/ToastContext';
+import { fetchAllData, addCourse, updateCourse, deleteCourse, addPath, updatePath, deletePath, addCategory, updateCategory, deleteCategory } from '../services/dataService';
+import { getAllUsers } from '../services/userService';
 
 export default function AdminDashboard() {
-  const { 
-    courses, paths, categories, 
-    addCourse, updateCourse, deleteCourse, 
-    addPath, updatePath, deletePath,
-    addCategory, updateCategory, deleteCategory,
-    refreshData
-  } = useData();
-  const { getAllUsers } = useAuth();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [paths, setPaths] = useState<LearningPath[]>([]);
+  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const { showToast } = useToast();
   
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await fetchAllData();
+        setCourses(data.courses);
+        setPaths(data.paths);
+        setCategories(data.categories);
+        const fetchedUsers = await getAllUsers();
+        setUsers(fetchedUsers);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    load();
+    const handleDataChange = () => load();
+    window.addEventListener('data_change', handleDataChange);
+    return () => window.removeEventListener('data_change', handleDataChange);
+  }, []);
+
   const [activeTab, setActiveTab] = useState<'courses' | 'paths' | 'users' | 'categories'>('courses');
 
   // Estados para gerenciar Módulos de um Curso
@@ -38,7 +52,7 @@ export default function AdminDashboard() {
         })
       });
       setNewModuleTitle('');
-      await refreshData();
+      window.dispatchEvent(new Event('data_change'));
       showToast('Módulo adicionado!', 'success');
     } catch(e) { console.error(e); }
   };
@@ -46,7 +60,7 @@ export default function AdminDashboard() {
   const handleDeleteModule = async (modId: string) => {
     try {
       await fetch(`http://localhost:3000/modulos/${modId}`, { method: 'DELETE' });
-      await refreshData();
+      window.dispatchEvent(new Event('data_change'));
       showToast('Módulo removido!', 'success');
     } catch(e) { console.error(e); }
   };
@@ -75,7 +89,7 @@ export default function AdminDashboard() {
       setNewLessonTitle('');
       setNewLessonUrl('');
       setAddingLessonToModId(null);
-      await refreshData();
+      window.dispatchEvent(new Event('data_change'));
       showToast('Aula adicionada!', 'success');
     } catch(e) { console.error(e); }
   };
@@ -83,7 +97,7 @@ export default function AdminDashboard() {
   const handleDeleteLesson = async (lessonId: string) => {
     try {
       await fetch(`http://localhost:3000/aulas/${lessonId}`, { method: 'DELETE' });
-      await refreshData();
+      window.dispatchEvent(new Event('data_change'));
       showToast('Aula removida!', 'success');
     } catch(e) { console.error(e); }
   };
@@ -92,7 +106,7 @@ export default function AdminDashboard() {
   const [newCourseTitle, setNewCourseTitle] = useState('');
   const [newCourseId, setNewCourseId] = useState('');
 
-  const handleAddCourse = (e: React.FormEvent) => {
+  const handleAddCourse = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCourseTitle || !newCourseId) return;
 
@@ -111,22 +125,9 @@ export default function AdminDashboard() {
       modulesCount: 1,
       image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop',
       category: 'programming',
-      modules: [
-        {
-          id: `mod-${Date.now()}`,
-          title: 'Módulo 1',
-          lessons: [
-            {
-              id: `less-${Date.now()}`,
-              title: 'Aula de Introdução',
-              duration: '10 min',
-              videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ'
-            }
-          ]
-        }
-      ]
+      modules: []
     };
-    addCourse(newCourse);
+    await addCourse(newCourse);
     setNewCourseTitle('');
     setNewCourseId('');
     showToast('Curso adicionado com sucesso!', 'success');
@@ -145,12 +146,12 @@ export default function AdminDashboard() {
     setEditCourseTitle(c.title);
   };
 
-  const handleUpdateCourse = (e: React.FormEvent) => {
+  const handleUpdateCourse = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingCourseId) return;
     const course = courses.find(c => c.id === editingCourseId);
     if (course) {
-      updateCourse({ ...course, title: editCourseTitle });
+      await updateCourse({ ...course, title: editCourseTitle });
       showToast('Curso atualizado com sucesso!', 'success');
       setEditingCourseId(null);
     }
@@ -165,18 +166,18 @@ export default function AdminDashboard() {
     setEditPathTitle(p.title);
   };
 
-  const handleUpdatePath = (e: React.FormEvent) => {
+  const handleUpdatePath = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingPathId) return;
     const path = paths.find(p => p.id === editingPathId);
     if (path) {
-      updatePath({ ...path, title: editPathTitle });
+      await updatePath({ ...path, title: editPathTitle });
       showToast('Trilha atualizada com sucesso!', 'success');
       setEditingPathId(null);
     }
   };
 
-  const handleAddPath = (e: React.FormEvent) => {
+  const handleAddPath = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPathId || !newPathTitle) return;
 
@@ -187,11 +188,11 @@ export default function AdminDashboard() {
       icon: '🚀',
       coursesIds: []
     };
-    addPath(newPath);
+    await addPath(newPath);
     setNewPathId('');
     setNewPathTitle('');
     setNewPathDesc('');
-    showToast('Trilha adicionada com sucesso! Você pode editar o arquivo json se precisar associar cursos a ela posteriormente.', 'success');
+    showToast('Trilha adicionada com sucesso!', 'success');
   };
 
   // Estados de categoria
@@ -222,8 +223,6 @@ export default function AdminDashboard() {
     if (!linkingPathId) return;
 
     try {
-      // Remover todos os vínculos atuais para esta trilha (simplificado apagando tudo e recriando)
-      // Como o json-server não tem endpoint de bulk delete, o ideal seria buscar os atuais e deletar um por um
       const res = await fetch(`http://localhost:3000/trilhas_cursos?ID_Trilha=${linkingPathId}`);
       const atuais = await res.json();
       
@@ -231,7 +230,6 @@ export default function AdminDashboard() {
         await fetch(`http://localhost:3000/trilhas_cursos/${link.id}`, { method: 'DELETE' });
       }
 
-      // Adicionar os novos
       for (let i = 0; i < selectedCoursesForPath.length; i++) {
         const cId = selectedCoursesForPath[i];
         await fetch(`http://localhost:3000/trilhas_cursos`, {
@@ -246,7 +244,8 @@ export default function AdminDashboard() {
         });
       }
 
-      showToast('Cursos vinculados à trilha com sucesso! Atualize a página para ver os dados completos.', 'success');
+      window.dispatchEvent(new Event('data_change'));
+      showToast('Cursos vinculados à trilha com sucesso!', 'success');
       setLinkingPathId(null);
     } catch (e) {
       console.error(e);
@@ -254,10 +253,10 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleAddCategory = (e: React.FormEvent) => {
+  const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCategoryId || !newCategoryName) return;
-    addCategory({ id: newCategoryId, name: newCategoryName });
+    await addCategory({ id: newCategoryId, name: newCategoryName });
     setNewCategoryId('');
     setNewCategoryName('');
     showToast('Categoria adicionada!', 'success');
@@ -268,21 +267,19 @@ export default function AdminDashboard() {
     setEditCategoryName(c.name);
   };
 
-  const handleUpdateCategory = (e: React.FormEvent) => {
+  const handleUpdateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingCategoryId) return;
-    updateCategory({ id: editingCategoryId, name: editCategoryName });
+    await updateCategory({ id: editingCategoryId, name: editCategoryName });
     showToast('Categoria atualizada!', 'success');
     setEditingCategoryId(null);
   };
-
-  const users = getAllUsers();
 
   return (
     <div className="container-fluid px-4 py-4">
       <div className="d-flex align-items-center gap-3 mb-4">
         <div className="bg-warning bg-opacity-25 p-3 rounded-3 text-warning">
-          <Settings size={32} />
+          <i className="bi bi-gear-fill fs-3"></i>
         </div>
         <div>
           <h2 className="display-font fw-bold text-white mb-0">Painel do Administrador</h2>
@@ -296,7 +293,7 @@ export default function AdminDashboard() {
             className={`btn ${activeTab === 'courses' ? 'btn-premium-primary' : 'btn-outline-secondary text-white'}`}
             onClick={() => setActiveTab('courses')}
           >
-            <BookOpen size={16} className="me-2" />
+            <i className="bi bi-book me-2"></i>
             Cursos
           </button>
         </li>
@@ -305,7 +302,7 @@ export default function AdminDashboard() {
             className={`btn ${activeTab === 'paths' ? 'btn-premium-primary' : 'btn-outline-secondary text-white'}`}
             onClick={() => setActiveTab('paths')}
           >
-            <Map size={16} className="me-2" />
+            <i className="bi bi-map me-2"></i>
             Trilhas
           </button>
         </li>
@@ -314,7 +311,7 @@ export default function AdminDashboard() {
             className={`btn ${activeTab === 'users' ? 'btn-premium-primary' : 'btn-outline-secondary text-white'}`}
             onClick={() => setActiveTab('users')}
           >
-            <Users size={16} className="me-2" />
+            <i className="bi bi-people me-2"></i>
             Usuários
           </button>
         </li>
@@ -323,7 +320,7 @@ export default function AdminDashboard() {
             className={`btn ${activeTab === 'categories' ? 'btn-premium-primary' : 'btn-outline-secondary text-white'}`}
             onClick={() => setActiveTab('categories')}
           >
-            <BookOpen size={16} className="me-2" />
+            <i className="bi bi-tags me-2"></i>
             Categorias
           </button>
         </li>
@@ -520,7 +517,7 @@ export default function AdminDashboard() {
 
                 <div className="accordion" id="modulesAccordion">
                   {managingCourse.modules.length === 0 && <p className="text-secondary">Nenhum módulo cadastrado.</p>}
-                  {managingCourse.modules.map((m, index) => (
+                  {managingCourse.modules.map((m) => (
                     <div className="accordion-item bg-transparent border-secondary border-opacity-25 mb-2" key={m.id}>
                       <h2 className="accordion-header d-flex" id={`heading-${m.id}`}>
                         <button className="accordion-button bg-dark bg-opacity-50 text-white collapsed shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target={`#collapse-${m.id}`}>

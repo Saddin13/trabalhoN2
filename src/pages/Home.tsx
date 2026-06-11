@@ -1,15 +1,26 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { 
-  Search, BookOpen, Clock, Users, Star, ArrowRight, GraduationCap, TrendingUp, Award 
-} from 'lucide-react';
-import { useData } from '../contexts/DataContext';
+import { fetchAllData } from '../services/dataService';
+import { Course } from '../types';
 
 export default function Home() {
   const navigate = useNavigate();
-  const { courses, categories } = useData();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
+
+  useEffect(() => {
+    async function load() {
+      const data = await fetchAllData();
+      setCourses(data.courses);
+      setCategories(data.categories);
+    }
+    load();
+    const handleDataChange = () => load();
+    window.addEventListener('data_change', handleDataChange);
+    return () => window.removeEventListener('data_change', handleDataChange);
+  }, []);
 
   // Interactive metrics calculation
   const totalStudents = useMemo(() => {
@@ -60,7 +71,7 @@ export default function Home() {
             <div className="p-3 bg-dark bg-opacity-40 rounded-4 border border-light border-opacity-10 glass-panel" style={{ transform: 'rotate(2deg)' }}>
               <div className="d-flex align-items-center gap-3 mb-3 text-start">
                 <div className="bg-primary bg-opacity-25 p-2 rounded-3 text-primary">
-                  <Award size={32} />
+                  <i className="bi bi-award fs-3"></i>
                 </div>
                 <div>
                   <h6 className="mb-0 fw-bold">Certificação de Excelência</h6>
@@ -69,7 +80,7 @@ export default function Home() {
               </div>
               <div className="d-flex align-items-center gap-3 text-start">
                 <div className="bg-info bg-opacity-25 p-2 rounded-3 text-info">
-                  <TrendingUp size={32} />
+                  <i className="bi bi-graph-up-arrow fs-3"></i>
                 </div>
                 <div>
                   <h6 className="mb-0 fw-bold">Aceleração de Carreira</h6>
@@ -90,7 +101,7 @@ export default function Home() {
               <h2 className="mb-0 display-font fw-extrabold text-white">{courses.length}</h2>
             </div>
             <div className="bg-primary bg-opacity-10 text-primary p-3 rounded-3">
-              <BookOpen size={24} />
+              <i className="bi bi-book fs-4"></i>
             </div>
           </div>
         </div>
@@ -101,7 +112,7 @@ export default function Home() {
               <h2 className="mb-0 display-font fw-extrabold text-white">{totalStudents.toLocaleString()}+</h2>
             </div>
             <div className="bg-info bg-opacity-10 text-info p-3 rounded-3">
-              <Users size={24} />
+              <i className="bi bi-people fs-4"></i>
             </div>
           </div>
         </div>
@@ -112,7 +123,7 @@ export default function Home() {
               <h2 className="mb-0 display-font fw-extrabold text-white">{totalHours} Horas</h2>
             </div>
             <div className="bg-warning bg-opacity-10 text-warning p-3 rounded-3">
-              <Clock size={24} />
+              <i className="bi bi-clock fs-4"></i>
             </div>
           </div>
         </div>
@@ -147,7 +158,7 @@ export default function Home() {
 
         <div className="mb-4">
           <div className="position-relative">
-            <Search className="position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary" size={20} />
+            <i className="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary fs-5"></i>
             <input 
               type="text" 
               className="form-control glass-input ps-5 w-100" 
@@ -158,8 +169,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-
-
 
       {/* Courses Cards Grid */}
       {filteredCourses.length > 0 ? (
@@ -194,7 +203,7 @@ export default function Home() {
                         {course.level}
                       </span>
                       <div className="d-flex align-items-center text-warning gap-1">
-                        <Star size={16} fill="currentColor" />
+                        <i className="bi bi-star-fill fs-6"></i>
                         <span className="small fw-bold">{course.rating}</span>
                       </div>
                     </div>
@@ -209,15 +218,14 @@ export default function Home() {
                   </div>
 
                   <div>
-                    {/* Horizontal Line separating info */}
                     <div className="border-top border-light border-opacity-10 pt-3 mb-3">
                       <div className="row text-secondary g-0 text-center">
                         <div className="col-6 text-start d-flex align-items-center gap-2">
-                          <Users size={16} className="text-primary" />
+                          <i className="bi bi-people fs-6 text-primary"></i>
                           <span className="small fw-semibold">{course.studentsCount} alunos</span>
                         </div>
                         <div className="col-6 text-end d-flex align-items-center justify-content-end gap-2">
-                          <Clock size={16} className="text-info" />
+                          <i className="bi bi-clock fs-6 text-info"></i>
                           <span className="small fw-semibold">{course.duration}</span>
                         </div>
                       </div>
@@ -227,7 +235,7 @@ export default function Home() {
                       onClick={() => navigate(`/curso/${course.id}`)}
                       className="btn btn-premium-primary w-100 d-flex align-items-center justify-content-center gap-2"
                     >
-                      Acessar Detalhes <ArrowRight size={16} />
+                      Acessar Detalhes <i className="bi bi-arrow-right"></i>
                     </button>
                   </div>
                 </div>
@@ -237,7 +245,7 @@ export default function Home() {
         </div>
       ) : (
         <div className="glass-panel p-5 text-center rounded-4 my-5 border border-dashed border-secondary border-opacity-25">
-          <GraduationCap size={64} className="text-muted mb-3" />
+          <i className="bi bi-mortarboard fs-1 text-muted mb-3 d-block"></i>
           <h4 className="text-white fw-bold">Nenhum curso encontrado</h4>
           <p className="text-secondary mx-auto" style={{ maxWidth: '400px' }}>
             Não encontramos resultados para a sua busca ou filtros selecionados. Tente ajustar os termos ou selecionar outra categoria.
@@ -253,4 +261,3 @@ export default function Home() {
     </div>
   );
 }
-

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { LogIn, UserPlus } from 'lucide-react';
+import { login, register } from '../services/authService';
+import { useToast } from '../contexts/ToastContext';
 
 interface LoginModalProps {
   onClose: () => void;
 }
 
 export default function LoginModal({ onClose }: LoginModalProps) {
-  const { login, register } = useAuth();
   const [isRegistering, setIsRegistering] = useState(false);
+  const { showToast } = useToast();
   
   // Login State
   const [loginEmail, setLoginEmail] = useState('');
@@ -20,18 +20,28 @@ export default function LoginModal({ onClose }: LoginModalProps) {
   const [registerPassword, setRegisterPassword] = useState('');
   const [role, setRole] = useState<'student' | 'admin'>('student');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!loginEmail || !loginPassword) return;
-    login(loginEmail, loginPassword);
-    onClose();
+    const result = await login(loginEmail, loginPassword);
+    if (result.ok) {
+      showToast('Login realizado com sucesso', 'success');
+      onClose();
+    } else {
+      showToast(result.message || 'Erro no login', 'error');
+    }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !registerPassword) return;
-    register(name, email, registerPassword, role);
-    onClose();
+    const result = await register(name, email, registerPassword, role);
+    if (result.ok) {
+      showToast('Conta criada com sucesso', 'success');
+      onClose();
+    } else {
+      showToast(result.message || 'Erro no cadastro', 'error');
+    }
   };
 
   return (
@@ -73,7 +83,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
                   />
                 </div>
                 <button type="submit" className="btn btn-premium-primary w-100 d-flex align-items-center justify-content-center gap-2">
-                  <LogIn size={18} /> Entrar
+                  <i className="bi bi-box-arrow-in-right"></i> Entrar
                 </button>
                 <div className="text-center mt-3">
                   <button type="button" className="btn btn-link text-info text-decoration-none small p-0" onClick={() => setIsRegistering(true)}>
@@ -129,7 +139,7 @@ export default function LoginModal({ onClose }: LoginModalProps) {
                   </select>
                 </div>
                 <button type="submit" className="btn btn-premium-primary w-100 d-flex align-items-center justify-content-center gap-2">
-                  <UserPlus size={18} /> Cadastrar
+                  <i className="bi bi-person-plus"></i> Cadastrar
                 </button>
                 <div className="text-center mt-3">
                   <button type="button" className="btn btn-link text-info text-decoration-none small p-0" onClick={() => setIsRegistering(false)}>

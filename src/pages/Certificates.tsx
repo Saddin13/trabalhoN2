@@ -1,12 +1,28 @@
-import { useAuth } from '../contexts/AuthContext';
-import { useData } from '../contexts/DataContext';
-import { Award, Download, CheckCircle, ShieldCheck } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { getSession } from '../services/authService';
+import { fetchAllData } from '../services/dataService';
 import { useToast } from '../contexts/ToastContext';
+import { Course } from '../types';
 
 export default function Certificates() {
-  const { user } = useAuth();
-  const { courses } = useData();
+  const user = getSession();
+  const [courses, setCourses] = useState<Course[]>([]);
   const { showToast } = useToast();
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await fetchAllData();
+        setCourses(data.courses);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    load();
+    const handleDataChange = () => load();
+    window.addEventListener('data_change', handleDataChange);
+    return () => window.removeEventListener('data_change', handleDataChange);
+  }, []);
 
   if (!user) return null;
 
@@ -22,7 +38,7 @@ export default function Certificates() {
 
       {user.certificates.length === 0 ? (
         <div className="glass-panel p-5 text-center rounded-4 border border-dashed border-secondary border-opacity-25">
-          <Award size={64} className="text-muted mb-3" />
+          <i className="bi bi-award fs-1 text-muted mb-3 d-block"></i>
           <h4 className="text-white fw-bold">Nenhum certificado emitido</h4>
           <p className="text-secondary mx-auto" style={{ maxWidth: '400px' }}>
             Complete 100% de um curso para emitir automaticamente seu certificado de conclusão.
@@ -44,14 +60,14 @@ export default function Certificates() {
                   className="position-absolute opacity-10" 
                   style={{ top: '-10%', right: '-5%', transform: 'rotate(15deg)' }}
                 >
-                  <Award size={300} color="#e2e8f0" />
+                  <i className="bi bi-award-fill" style={{ fontSize: '300px', color: '#e2e8f0' }}></i>
                 </div>
 
                 <div className="row g-0">
                   <div className="col-md-8 p-4 p-md-5 z-1">
                     <div className="d-flex align-items-center gap-3 mb-4">
                       <div className="bg-primary bg-opacity-25 rounded-circle p-2">
-                        <Award size={28} className="text-primary" />
+                        <i className="bi bi-award fs-4 text-primary"></i>
                       </div>
                       <h4 className="text-white fw-bold mb-0 display-font">Saddi Estudos</h4>
                     </div>
@@ -69,14 +85,14 @@ export default function Certificates() {
                       <div>
                         <p className="text-secondary small mb-1">Data de Emissão</p>
                         <strong className="text-white d-flex align-items-center gap-2">
-                          <CheckCircle size={16} className="text-success" />
+                          <i className="bi bi-check-circle-fill text-success"></i>
                           {new Date(cert.issueDate).toLocaleDateString()}
                         </strong>
                       </div>
                       <div>
                         <p className="text-secondary small mb-1">Código de Verificação</p>
                         <strong className="text-white d-flex align-items-center gap-2" style={{ fontFamily: 'monospace' }}>
-                          <ShieldCheck size={16} className="text-info" />
+                          <i className="bi bi-shield-check text-info"></i>
                           {cert.verificationCode || 'VFY-VALIDO'}
                         </strong>
                       </div>
@@ -94,7 +110,7 @@ export default function Certificates() {
                       className="btn btn-premium-primary w-100 d-flex align-items-center justify-content-center gap-2 py-2"
                       onClick={() => showToast('Iniciando download do PDF do certificado...', 'success')}
                     >
-                      <Download size={18} />
+                      <i className="bi bi-download"></i>
                       Baixar Certificado
                     </button>
                   </div>
